@@ -31,7 +31,7 @@ public class CustomerController {
     @RequestMapping(value = "/customers/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long id) {
         System.out.println("Fetching customer with id " + id);
-        Customer customer = customerService.fingById(id);
+        Customer customer = customerService.findById(id);
         if (customer == null) {
             System.out.println("Customer with id: " + id + " not found");
             return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
@@ -49,5 +49,33 @@ public class CustomerController {
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
     }
 
+    //    Update customer
+    @RequestMapping(value = "/customers/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") Long id, @RequestBody Customer customer) {
+        System.out.println("Update a customer " + id);
+        Customer currentCustomer = customerService.findById(id);
+        if (currentCustomer == null) {
+            System.out.println("Customer with id " + id + " not found");
+            return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
+        }
+        currentCustomer.setFirstName(customer.getFirstName());
+        currentCustomer.setLastName(customer.getLastName());
+        currentCustomer.setId(id);
 
+        customerService.save(currentCustomer);
+        return new ResponseEntity<Customer>(currentCustomer, HttpStatus.OK);
+    }
+
+//    Delete Customer
+    @RequestMapping(value = "/customers/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Customer> deleteCustomer(@PathVariable("id") Long id) {
+        System.out.println("Fetching & Delete a customer with id " + id);
+        Customer customer = customerService.findById(id);
+        if (customer == null) {
+            System.out.println("Customer with id " + id + " not found");
+            return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
+        }
+        customerService.remove(id);
+        return new ResponseEntity<Customer>(HttpStatus.NO_CONTENT);
+    }
 }
